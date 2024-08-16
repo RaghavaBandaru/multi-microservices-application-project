@@ -17,8 +17,8 @@ pipeline {
         stage("SonarQube SAST Analysis"){
             steps{
                 withSonarQubeEnv('Sonar-Server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=app-cart-service \
-                    -Dsonar.projectKey=app-cart-service '''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=app-checkout-service \
+                    -Dsonar.projectKey=app-checkout-service '''
                 }
             }
         }
@@ -41,7 +41,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'DockerHub-Credential', toolName: 'docker') {
-                        sh "docker build -t awanmbandi/cartservice:latest ./src"
+                        sh "docker build -t awanmbandi/checkoutservice:latest ."
                     }
                 }
             }
@@ -49,7 +49,7 @@ pipeline {
         // Execute SCA/Dependency Test on Service Docker Image
         stage('Snyk SCA Test | Dependencies') {
             steps {
-                sh "${SNYK_HOME}/snyk-linux test --docker awanmbandi/cartservice:latest || true" 
+                sh "${SNYK_HOME}/snyk-linux test --docker awanmbandi/checkoutservice:latest || true" 
             }
         }
         // Push Service Image to DockerHub
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'DockerHub-Credential', toolName: 'docker') {
-                        sh "docker push awanmbandi/cartservice:latest "
+                        sh "docker push awanmbandi/checkoutservice:latest "
                     }
                 }
             }
